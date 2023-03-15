@@ -1,30 +1,33 @@
 #include "TextureStorage.h"
 
-sf::Texture* TextureStorage::snakeTexture = new sf::Texture();
-sf::Texture* TextureStorage::appleTexture = new sf::Texture();
-sf::Texture* TextureStorage::backgroundTexture = new sf::Texture();
+const std::string TextureStorage::prefix = "Textures/";
+const std::string TextureStorage::postfix = ".png";
 
-std::map<std::string, sf::Texture*> TextureStorage::textures{
-	{"APPLE",  TextureStorage::appleTexture},
-	{"SNAKE",TextureStorage::snakeTexture},
-	{"BG",TextureStorage::backgroundTexture} };
+std::map<std::string, std::shared_ptr<sf::Texture>> TextureStorage::textures;
 
+std::shared_ptr<sf::Texture> TextureStorage::getTexture(
+    const std::string_view name) {
+  const auto it = textures.find(name.data());
 
-TextureStorage::TextureStorage()
-{
-	this->snakeTexture->loadFromFile("Textures/tilemap.png");
-	this->appleTexture->loadFromFile("Textures/small_apple.png");
-	this->backgroundTexture->loadFromFile("Textures/grass_1.png");
+  if (it != textures.end()) {
+    return it->second;
+  }
+
+  if (load(name)) {
+    return getTexture(name);
+  }
+
+  return nullptr;
 }
 
-TextureStorage::~TextureStorage()
-{
-	for (auto& t : this->textures) {
-		delete t.second;
-	}
-}
+bool TextureStorage::load(const std::string_view name) {
+  std::shared_ptr<sf::Texture> texture = std::make_shared<sf::Texture>();
 
-sf::Texture* TextureStorage::getTextue()
-{
-	return this->appleTexture;
+  const bool result = texture->loadFromFile(prefix + name.data() + postfix);
+
+  if (result) {
+    textures.emplace(name, texture);
+  }
+
+  return result;
 }

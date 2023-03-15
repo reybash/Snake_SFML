@@ -1,36 +1,34 @@
 #pragma once
 
-#include <iostream>
-#include "SnakeNode.h"
+#include <vector>
+
 #include "SFML/Audio.hpp"
+#include "SnakeNode.h"
 
-class Snake
-{
-public:
-	Snake();
-	~Snake();
+class Snake {
+ public:
+  Snake();
+  ~Snake();
 
-	const std::vector<SnakeNode>& getSnakeNodes() const;
-	const sf::FloatRect getHeadBounds() const;
+  const std::vector<SnakeNode>& getSnakeNodes() const;
+  const sf::FloatRect getHeadBounds() const;
 
-	void addSnakeNode();
-	bool checkSelfCol();
+  void addSnakeNode();
+  bool checkSelfCol();
 
-	void clear();
+  void render(sf::RenderTarget& target);
+  void update();
 
-	void render(sf::RenderTarget& target);
-	void update();
-private:
-	std::vector<SnakeNode> snake;
+ private:
+  std::vector<SnakeNode> snake;
 
-	sf::SoundBuffer dieBuffer;
-	sf::Sound dieSound;
+  size_t snakeSize = 2;
 
-	size_t snakeSize = 2;
-	
-	void move();
-	void updateTexture();
-	void checkEdgeCol();
+  static const int FrameSize = 40;
 
-	bool isPosDifGreatZero(float pos1, float pos2);
+  void move();
+  void updateTexture();
+  void checkEdgeCol();
+
+  bool isPosDifGreatZero(float pos1, float pos2);
 };

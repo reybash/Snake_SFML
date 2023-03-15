@@ -1,15 +1,13 @@
 #include "Game.h"
 
-int main()
-{
-	std::srand(static_cast<unsigned>(time(NULL)));
+int main() {
+  std::srand(static_cast<unsigned>(time(NULL)));
 
-	Game game;
+  Game game;
 
-	while (game.getWindiowIsOpen())
-	{
-		game.run();
-	}
+  while (game.getWindiowIsOpen()) {
+    game.run();
+  }
 
-	return 0;
+  return 0;
 }

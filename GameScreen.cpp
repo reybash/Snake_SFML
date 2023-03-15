@@ -1,78 +1,91 @@
 #include "GameScreen.h"
+
 #include "Game.h"
 #include "GameOverScreen.h"
 
-GameScreen::GameScreen()
-{
-	this->spawnApples();
+int GameScreen::score = 0;
+int GameScreen::HighScore = 0;
 
-	this->pickupBuffer.loadFromFile("Music/crunch.wav");
-	this->pickupSound.setBuffer(this->pickupBuffer);
-	this->pickupSound.setVolume(25.f);
+GameScreen::GameScreen() {
+  score = 0;
+  auto result = TextureStorage::getTexture("apple");
+
+  if (result) {
+    this->apple.setTexture(*result.get());
+  }
+
+  this->spawnApple();
+
+  this->pickupBuffer.loadFromFile("Music/crunch.wav");
+  this->pickupSound.setBuffer(this->pickupBuffer);
+  this->pickupSound.setVolume(25.f);
+
+  this->dieBuffer.loadFromFile("Music/died_sound_effect.wav");
+  this->dieSound.setBuffer(this->dieBuffer);
+  this->dieSound.setVolume(20.f);
 }
 
-GameScreen::~GameScreen()
-{
+GameScreen::~GameScreen() {}
+
+void GameScreen::getSnakeSelfCol() {
+  if (this->snake.checkSelfCol()) {
+    dieSound.play();
+    sf::sleep(sf::seconds(dieBuffer.getDuration().asSeconds()));
+    this->over = true;
+  }
 }
 
-void GameScreen::getSnakeSelfCol()
-{
-	if (this->snake.checkSelfCol())
-	{
-		Game::screen = std::make_unique<GameOverScreen>(this->score);
-	}
+void GameScreen::spawnApple() {
+  this->apple.setPosition(
+      static_cast<float>(SnakeNode::Size +
+                         rand() %
+                             static_cast<int>((Game::Width - SnakeNode::Size) /
+                                              SnakeNode::Size) *
+                             SnakeNode::Size),
+      static_cast<float>(SnakeNode::Size +
+                         rand() %
+                             static_cast<int>((Game::Height - SnakeNode::Size) /
+                                              SnakeNode::Size) *
+                             SnakeNode::Size));
 }
 
-void GameScreen::spawnApples()
-{
-	while (this->apples.size() < this->maxApples) {
-		this->apples.push_back(Apple(snake, apples));
-	}
+void GameScreen::updateLocApple() {
+  do {
+    this->wrongSpawnApple = false;
+
+    for (auto& s : snake.getSnakeNodes()) {
+      if (s.getGlobalBounds().intersects(this->apple.getGlobalBounds())) {
+        this->spawnApple();
+
+        this->wrongSpawnApple = true;
+
+        break;
+      }
+    }
+  } while (this->wrongSpawnApple);
 }
 
-void GameScreen::updateSpawnApples()
-{
-	if (this->spawnTimerApple < this->spawnTimerAppleMax && this->apples.size() < this->maxApples) {
-		this->spawnTimerApple++;
-	}
-	else if (this->apples.size() < this->maxApples) {
-		this->apples.push_back(Apple(snake, apples));
+void GameScreen::snakeGrow() {
+  if (this->snake.getHeadBounds().intersects(this->apple.getGlobalBounds())) {
+    this->snake.addSnakeNode();
+    this->spawnApple();
+    this->updateLocApple();
 
-		this->spawnTimerApple = 0;
-	}
+    this->score++;
+
+    this->pickupSound.play();
+  }
 }
 
-void GameScreen::snakeGrow()
-{
-	for (size_t i = 0; i < this->apples.size(); i++) {
-		if (this->snake.getHeadBounds().intersects(this->apples[i].getGlobalBounds())) {
-			this->snake.addSnakeNode();
+void GameScreen::render(sf::RenderWindow& window) {
+  window.draw(this->apple);
 
-			this->apples.erase(this->apples.begin() + i);
-
-			this->score++;
-			//this->score += this->spawnTimerAppleMax - this->spawnTimerApple;
-
-			this->pickupSound.play();
-
-			break;
-		}
-	}
+  this->snake.render(window);
 }
 
-void GameScreen::render(sf::RenderWindow& window)
-{
-	for (auto& a : this->apples) {
-		a.render(window);
-	}
+void GameScreen::update(sf::RenderWindow& window) {
+  this->snake.update();
 
-	this->snake.render(window);
-}
-
-void GameScreen::update(sf::RenderWindow& window)
-{
-	this->updateSpawnApples();
-	this->snake.update();
-	this->snakeGrow();
-	this->getSnakeSelfCol();
+  this->snakeGrow();
+  this->getSnakeSelfCol();
 }

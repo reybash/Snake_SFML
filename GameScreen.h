@@ -1,34 +1,36 @@
 #pragma once
 
 #include "SFML/Graphics.hpp"
-#include "SnakeNode.h"
-#include "Apple.h"
 #include "Screen.h"
+#include "Snake.h"
 
-class GameScreen : public Screen
-{
-public:
-	GameScreen();
-	~GameScreen();
+class GameScreen : public Screen {
+ public:
+  GameScreen();
+  ~GameScreen();
 
-	void getSnakeSelfCol();
-	
-	void render(sf::RenderWindow& window) override;
-	void update(sf::RenderWindow& window) override;
-private:
-	Snake snake;
-	std::vector<Apple> apples;
+  static int HighScore;
+  static int score;
 
-	sf::SoundBuffer pickupBuffer;
-	sf::Sound pickupSound;
+  void render(sf::RenderWindow& window) override;
+  void update(sf::RenderWindow& window) override;
 
-	int spawnTimerApple = 0;
-	int const spawnTimerAppleMax = 20;
-	int const maxApples = 5;
-	int score = 0;
+ private:
+  Snake snake;
+  sf::Sprite apple;
 
-	void spawnApples();
-	void updateSpawnApples();
+  sf::SoundBuffer pickupBuffer;
+  sf::Sound pickupSound;
 
-	void snakeGrow();
+  sf::SoundBuffer dieBuffer;
+  sf::Sound dieSound;
+
+  bool wrongSpawnApple = false;
+
+  void getSnakeSelfCol();
+
+  void spawnApple();
+  void updateLocApple();
+
+  void snakeGrow();
 };

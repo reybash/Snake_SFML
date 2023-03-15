@@ -3,21 +3,19 @@
 #include "Game.h"
 
 Snake::Snake() {
-  this->snake.push_back(SnakeNode(
-      sf::Vector2f(Game::Width / 2.f, Game::Height / 2.f),
-      *TextureStorage::textures["SNAKE"],
-      sf::IntRect(TextureStorage::FrameSize * 4, TextureStorage::FrameSize,
-                  TextureStorage::FrameSize, TextureStorage::FrameSize)));
+  SnakeNode::Size = FrameSize;
 
-  this->snake.push_back(SnakeNode(
-      sf::Vector2f(Game::Width / 2.f + SnakeNode::Size, Game::Height / 2.f),
-      *TextureStorage::textures["SNAKE"],
-      sf::IntRect(0, TextureStorage::FrameSize, TextureStorage::FrameSize,
-                  TextureStorage::FrameSize)));
+  auto result = TextureStorage::getTexture("snake");
 
-  this->dieBuffer.loadFromFile("Music/died_sound_effect.wav");
-  this->dieSound.setBuffer(this->dieBuffer);
-  this->dieSound.setVolume(20.f);
+  if (result) {
+    this->snake.push_back(SnakeNode(
+        sf::Vector2f(Game::Width / 2.f, Game::Height / 2.f), *result.get(),
+        sf::IntRect(FrameSize * 4, FrameSize, FrameSize, FrameSize)));
+
+    this->snake.push_back(SnakeNode(
+        sf::Vector2f(Game::Width / 2.f + SnakeNode::Size, Game::Height / 2.f),
+        *result.get(), sf::IntRect(0, FrameSize, FrameSize, FrameSize)));
+  }
 }
 
 Snake::~Snake() {}
@@ -54,55 +52,42 @@ bool Snake::isPosDifGreatZero(float pos1, float pos2) {
 void Snake::updateTexture() {
   if (this->isPosDifGreatZero(this->snake[1].getPosition().x,
                               this->snake[0].getPosition().x)) {
-    this->snake[0].setTextureRect(TextureStorage::FrameSize * 4,
-                                  TextureStorage::FrameSize,
-                                  TextureStorage::FrameSize);
+    this->snake[0].setTextureRect(FrameSize * 4, FrameSize, FrameSize);
   } else if (this->isPosDifGreatZero(this->snake[0].getPosition().x,
                                      this->snake[1].getPosition().x)) {
-    this->snake[0].setTextureRect(TextureStorage::FrameSize * 4, 0,
-                                  TextureStorage::FrameSize);
+    this->snake[0].setTextureRect(FrameSize * 4, 0, FrameSize);
   } else if (this->isPosDifGreatZero(this->snake[1].getPosition().y,
                                      this->snake[0].getPosition().y)) {
-    this->snake[0].setTextureRect(TextureStorage::FrameSize * 3, 0,
-                                  TextureStorage::FrameSize);
+    this->snake[0].setTextureRect(FrameSize * 3, 0, FrameSize);
   } else if (this->isPosDifGreatZero(this->snake[0].getPosition().y,
                                      this->snake[1].getPosition().y)) {
-    this->snake[0].setTextureRect(TextureStorage::FrameSize * 3,
-                                  TextureStorage::FrameSize,
-                                  TextureStorage::FrameSize);
+    this->snake[0].setTextureRect(FrameSize * 3, FrameSize, FrameSize);
   }
 
   if (this->isPosDifGreatZero(this->snake[snakeSize - 1].getPosition().x,
                               this->snake[snakeSize - 2].getPosition().x)) {
-    this->snake[snakeSize - 1].setTextureRect(0, TextureStorage::FrameSize,
-                                              TextureStorage::FrameSize);
+    this->snake[snakeSize - 1].setTextureRect(0, FrameSize, FrameSize);
   } else if (this->isPosDifGreatZero(
                  this->snake[snakeSize - 2].getPosition().x,
                  this->snake[snakeSize - 1].getPosition().x)) {
-    this->snake[snakeSize - 1].setTextureRect(TextureStorage::FrameSize, 0,
-                                              TextureStorage::FrameSize);
+    this->snake[snakeSize - 1].setTextureRect(FrameSize, 0, FrameSize);
   } else if (this->isPosDifGreatZero(
                  this->snake[snakeSize - 1].getPosition().y,
                  this->snake[snakeSize - 2].getPosition().y)) {
-    this->snake[snakeSize - 1].setTextureRect(0, 0, TextureStorage::FrameSize);
+    this->snake[snakeSize - 1].setTextureRect(0, 0, FrameSize);
   } else if (this->isPosDifGreatZero(
                  this->snake[snakeSize - 2].getPosition().y,
                  this->snake[snakeSize - 1].getPosition().y)) {
-    this->snake[snakeSize - 1].setTextureRect(TextureStorage::FrameSize,
-                                              TextureStorage::FrameSize,
-                                              TextureStorage::FrameSize);
+    this->snake[snakeSize - 1].setTextureRect(FrameSize, FrameSize, FrameSize);
   }
 
   for (size_t i = 1; i < snakeSize - 1; i++) {
     if (this->snake[i + 1].getPosition().x ==
         this->snake[i - 1].getPosition().x) {
-      this->snake[i].setTextureRect(TextureStorage::FrameSize * 2, 0,
-                                    TextureStorage::FrameSize);
+      this->snake[i].setTextureRect(FrameSize * 2, 0, FrameSize);
     } else if (this->snake[i + 1].getPosition().y ==
                this->snake[i - 1].getPosition().y) {
-      this->snake[i].setTextureRect(TextureStorage::FrameSize * 2,
-                                    TextureStorage::FrameSize,
-                                    TextureStorage::FrameSize);
+      this->snake[i].setTextureRect(FrameSize * 2, FrameSize, FrameSize);
     }
 
     if (this->isPosDifGreatZero(this->snake[i].getPosition().x,
@@ -113,9 +98,7 @@ void Snake::updateTexture() {
                                 this->snake[i - 1].getPosition().y) &&
             this->isPosDifGreatZero(this->snake[i].getPosition().x,
                                     this->snake[i + 1].getPosition().x)) {
-      this->snake[i].setTextureRect(TextureStorage::FrameSize * 6,
-                                    TextureStorage::FrameSize,
-                                    TextureStorage::FrameSize);
+      this->snake[i].setTextureRect(FrameSize * 6, FrameSize, FrameSize);
     } else if (this->isPosDifGreatZero(this->snake[i - 1].getPosition().x,
                                        this->snake[i].getPosition().x) &&
                    this->isPosDifGreatZero(
@@ -125,8 +108,7 @@ void Snake::updateTexture() {
                                        this->snake[i - 1].getPosition().y) &&
                    this->isPosDifGreatZero(this->snake[i + 1].getPosition().x,
                                            this->snake[i].getPosition().x)) {
-      this->snake[i].setTextureRect(TextureStorage::FrameSize * 5, 0,
-                                    TextureStorage::FrameSize);
+      this->snake[i].setTextureRect(FrameSize * 5, 0, FrameSize);
     } else if (this->isPosDifGreatZero(this->snake[i].getPosition().x,
                                        this->snake[i - 1].getPosition().x) &&
                    this->isPosDifGreatZero(this->snake[i + 1].getPosition().y,
@@ -136,8 +118,7 @@ void Snake::updateTexture() {
                    this->isPosDifGreatZero(
                        this->snake[i].getPosition().x,
                        this->snake[i + 1].getPosition().x)) {
-      this->snake[i].setTextureRect(TextureStorage::FrameSize * 6, 0,
-                                    TextureStorage::FrameSize);
+      this->snake[i].setTextureRect(FrameSize * 6, 0, FrameSize);
     } else if (this->isPosDifGreatZero(this->snake[i - 1].getPosition().x,
                                        this->snake[i].getPosition().x) &&
                    this->isPosDifGreatZero(this->snake[i + 1].getPosition().y,
@@ -146,9 +127,7 @@ void Snake::updateTexture() {
                                        this->snake[i].getPosition().y) &&
                    this->isPosDifGreatZero(this->snake[i + 1].getPosition().x,
                                            this->snake[i].getPosition().x)) {
-      this->snake[i].setTextureRect(TextureStorage::FrameSize * 5,
-                                    TextureStorage::FrameSize,
-                                    TextureStorage::FrameSize);
+      this->snake[i].setTextureRect(FrameSize * 5, FrameSize, FrameSize);
     }
   }
 }
@@ -171,16 +150,12 @@ bool Snake::checkSelfCol() {
   for (size_t i = 2; i < snakeSize; i++) {
     if (this->snake[0].getGlobalBounds().intersects(
             this->snake[i].getGlobalBounds())) {
-      dieSound.play();
-      sf::sleep(sf::seconds(dieBuffer.getDuration().asSeconds()));
       return true;
     }
   }
 
   return false;
 }
-
-void Snake::clear() { this->~Snake(); }
 
 void Snake::render(sf::RenderTarget& target) {
   for (auto& s : this->snake) {
@@ -190,7 +165,6 @@ void Snake::render(sf::RenderTarget& target) {
 
 void Snake::update() {
   this->move();
-
   this->snake[0].update();
 
   this->checkEdgeCol();

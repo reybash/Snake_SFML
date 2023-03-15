@@ -2,21 +2,19 @@
 
 #include <SFML/Graphics.hpp>
 #include <map>
+#include <memory>
 #include <string>
+#include <string_view>
 
 class TextureStorage {
  public:
-  TextureStorage();
-  ~TextureStorage();
-
-  static std::map<std::string, sf::Texture*> textures;
-
-  static const int FrameSize = 40;
+  static std::shared_ptr<sf::Texture> getTexture(const std::string_view name);
 
  private:
-  static sf::Texture* snakeTexture;
-  static sf::Texture* appleTexture;
-  static sf::Texture* backgroundTexture;
+  static bool load(const std::string_view name);
 
-  sf::Texture* getTextue();
+  static std::map<std::string, std::shared_ptr<sf::Texture>> textures;
+
+  static const std::string prefix;
+  static const std::string postfix;
 };

@@ -1,41 +1,42 @@
 #pragma once
 
-#include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
-#include "GameScreen.h"
+#include <SFML/Graphics.hpp>
+
 #include "Screen.h"
 #include "TextureStorage.h"
 
-class Game
-{
-public:
-	Game();
-	~Game();
+enum STATE { MAINGAME = 0, GAMEOVER };
 
-	static const int Width = 900;
-	static const int Height = 600;
-	static int HighScore;
+class Game {
+ public:
+  Game();
+  ~Game();
 
-	static std::unique_ptr<Screen> screen;
+  static const int Width = 1200;
+  static const int Height = 800;
 
-	const bool getWindiowIsOpen() const;
-	
-	void run();
-private:
-	sf::RenderWindow window;
-	sf::VideoMode videoMode;
-	sf::Event event;
+  static std::unique_ptr<Screen> screen;
 
-	sf::Music music;
+  const bool getWindiowIsOpen() const;
 
-	TextureStorage textures;
+  void run();
 
-	sf::RectangleShape backGround;
+ private:
+  sf::RenderWindow window;
+  sf::VideoMode videoMode;
+  sf::Event event;
 
-	void initWindow();
+  sf::Music music;
 
-	void updateEvents();
+  sf::RectangleShape backGround;
 
-	void render();
-	void update();
+  short changeState;
+
+  void initWindow();
+
+  void updateEvents();
+
+  void render();
+  void update();
 };
